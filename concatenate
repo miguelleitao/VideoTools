@@ -1,0 +1,43 @@
+#!/bin/bash
+outfile=out.mpg
+flist=flist.txt
+function usage() {
+	echo "Usage: $0 image_in frames [zdelta [xdelta [ydelta]]]"
+}
+fname=`basename $1 .jpg`
+
+if [ "$#" -lt "2" ]; then
+	usage
+	echo "Usage: [-o output.mpg] in1.mpg in2.mpg ... inN.mpg"
+	exit
+fi
+while [ "$#" -gt "0" ]; do
+	echo "option:$1"
+	case $1 in
+	    "-o")
+		shift
+		outfile=$1
+		echo "outfile=$outfile"
+		;;
+	    "-h")
+		usage
+		exit
+		;;
+	    *)
+		break 
+	esac
+	shift
+done
+echo "saiu do primerio"
+echo "# input file list" >$flist
+echo "# List created by concatenate, from VideoTools." >> $flist
+echo "# https://github.com/miguelleitao/VideoTools" >> $flist
+echo "# Output file: $outfile" >>$flist
+while [ "$#" -gt "0" ]; do
+        echo "file $1" >> $flist
+        shift
+done
+echo "criou"
+cat $flist
+ffmpeg -f concat -i $flist -c copy $outfile
+
