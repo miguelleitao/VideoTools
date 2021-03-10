@@ -2,3 +2,9 @@
 *.mpeg
 *.mp?
 *.h264
+~*
+*~
+lixo*
+*.old
+*.bak
+
