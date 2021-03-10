@@ -1,0 +1,32 @@
+#!/bin/bash
+AVCONV=ffmpeg
+trim() {
+    local var="$*"
+    var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
+    echo -n "$var"
+}
+if [ "$#" -lt "2" ]; then
+	echo "Usage: $0 image_in frames [zdelta [xdelta [ydelta]]]"
+	exit
+fi
+fname=`basename $1 .jpg`
+
+zdelta=${3:-"100.0"}
+xdelta=${4:-"0.0"}
+ydelta=${5:-"0.0"}
+echo $ydelta
+echo $xdelta
+for i in `seq 1 $2`;
+do
+	echo "Creating ${fname}_$i.jpg"
+	zfactor=`calc 100.0+$i*$zdelta/$3`
+	xfactor=`calc $xdelta*$i/$3`
+	yfactor=`calc $ydelta*$i/$3`
+	echo $yfactor
+	xfactor=`trim $xfactor`
+	yfactor=`trim $yfactor`
+	convert $1 -resize ${zfactor}% -gravity center -crop 1280x720+${xfactor}+${yfactor} ${fname}_$i.jpg 
+done
+${AVCONV} -r 30 -i ${fname}_%d.jpg -vcodec libx264 ${fname}.mp4
+
