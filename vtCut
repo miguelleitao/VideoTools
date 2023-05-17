@@ -1,8 +1,9 @@
 #!/bin/bash
+set -x
 outfile=out.mpg
 flist=flist.txt
 function usage() {
-	echo "Usage: $0 [-o output.mpg] imag_1 imag_2 ... imag_n"
+	echo "Usage: $0 [-o output.mpg] input.mpg tIni tEnd"
 }
 fname=`basename $1 .jpg`
 
@@ -28,15 +29,18 @@ while [ "$#" -gt "0" ]; do
 	esac
 	shift
 done
-#echo "saiu do primeiro"
+echo "saiu do primerio"
+
+ffmpeg -i $1 -c copy -t $2 $1_p1.mp4 
+ffmpeg -ss $3 -i $1 -c copy $1_p2.mp4
+echo "criou"
 echo "# input file list" >$flist
-echo "# List created by concatenate, from VideoTools." >> $flist
+echo "# List created by vtCut, from VideoTools." >> $flist
 echo "# https://github.com/miguelleitao/VideoTools" >> $flist
 echo "# Output file: $outfile" >>$flist
-while [ "$#" -gt "0" ]; do
-        echo "file $1" >> $flist
-        shift
-done
+
+echo "file $1_p1.mp4" >> $flist
+echo "file $1_p2.mp4" >> $flist
 cat $flist
 ffmpeg -f concat -i $flist -c copy $outfile
 
